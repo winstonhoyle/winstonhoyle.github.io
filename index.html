@@ -3,15 +3,15 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Display a map on a webpage</title>
+    <title>Weather Map - NOAA - Max Temp</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin="" />
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
+
+    <script src="leaflet-ajax.js"></script>
     <style>
         body {
             margin: 0;
@@ -30,16 +30,7 @@
 <body>
     <div id="map"></div>
     <script>
-        //mapboxgl.accessToken = 'pk.eyJ1Ijoid2luc3RvbmhveWxlIiwiYSI6ImNsb3lvc2QyYjA1NjEya24xazVsZGRucXQifQ.Beq-2RHxSPOGL1TTLx_joQ';
-        /*
-        const map = new mapboxgl.Map({
-            container: 'map', // container ID
-            // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
-            style: 'mapbox://styles/mapbox/streets-v12', // style URL
-            center: [-74.5, 40], // starting position [lng, lat]
-            zoom: 9 // starting zoom
-        });
-        */
+
         var map = L.map('map').setView([40, -75], 11);
 
         var date = new Date()
@@ -78,6 +69,11 @@
             exceptions: 'inimage',
             vt: query_date
         })
+
+        var geojsonLayer = new L.GeoJSON.AJAX('https://github.com/winstonhoyle/winstonhoyle.github.io/blob/main/RockyMountainNationalParkTrails.geojson');
+        geojsonLayer.on('data:loaded', function () {
+            geojsonLayer.addTo(mymap);
+        });
 
         osm.addTo(map);
         noaa_temp.addTo(map);
