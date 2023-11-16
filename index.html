@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Display a map on a webpage</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        //mapboxgl.accessToken = 'pk.eyJ1Ijoid2luc3RvbmhveWxlIiwiYSI6ImNsb3lvc2QyYjA1NjEya24xazVsZGRucXQifQ.Beq-2RHxSPOGL1TTLx_joQ';
+        /*
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+            style: 'mapbox://styles/mapbox/streets-v12', // style URL
+            center: [-74.5, 40], // starting position [lng, lat]
+            zoom: 9 // starting zoom
+        });
+        */
+        var map = L.map('map').setView([40, -75], 11);
+
+        var date = new Date()
+        query_date = generateDatabaseDateTime(date)
+
+        function generateDatabaseDateTime(date) {
+            day = parseInt(date.toISOString().substring(8, 10)) + 1
+            return date.toISOString().substring(0, 8) + day.toString() + "T00:00"
+        }
+
+        var noaaUrl_temp = 'http://digital.weather.gov/wms.php?CRS=EPSG:3857'
+        var noaaUrl_points = 'https://digital.weather.gov/wms.php?REQUEST=GetMap&CRS=EPSG:3857'
+
+        var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        });
+
+        var noaa_temp = L.tileLayer.wms(noaaUrl_temp, {
+            layers: 'ndfd.conus.maxt',
+            transparent: 'true',
+            format: 'image/png',
+            opacity: 0.5,
+            version: '1.3.0',
+            service: 'wms',
+            exceptions: 'inimage',
+            vt: query_date
+        });
+
+        var noaa_points = L.tileLayer.wms(noaaUrl_points, {
+            layers: 'ndfd.conus.maxt.points',
+            format: 'image/png',
+            transparent: 'true',
+            version: '1.3.0',
+            service: 'wms',
+            exceptions: 'inimage',
+            vt: query_date
+        })
+
+        osm.addTo(map);
+        noaa_temp.addTo(map);
+        noaa_points.addTo(map);
+        noaa_points.bringToFront();
+
+        map.on('zoom', function () {
+            map.removeLayer(noaa_temp);
+            noaa_temp.addTo(map);
+        })
+    </script>
+
+</body>
+
+</html>
