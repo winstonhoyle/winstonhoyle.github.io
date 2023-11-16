@@ -10,8 +10,6 @@
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
-
-    <script src="leaflet-ajax.js"></script>
     <style>
         body {
             margin: 0;
@@ -69,11 +67,6 @@
             exceptions: 'inimage',
             vt: query_date
         })
-
-        var geojsonLayer = new L.GeoJSON.AJAX('https://github.com/winstonhoyle/winstonhoyle.github.io/blob/main/RockyMountainNationalParkTrails.geojson');
-        geojsonLayer.on('data:loaded', function () {
-            geojsonLayer.addTo(mymap);
-        });
 
         osm.addTo(map);
         noaa_temp.addTo(map);
